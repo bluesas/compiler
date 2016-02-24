@@ -1,3 +1,5 @@
+package analyser;
+
 /**
  * class expr, which stands for the expression.
  */
@@ -14,7 +16,7 @@ public class Analyser{
 			lookahead = this.input.charAt(0);
 			lookaheadPointer = 0;
 		}
-	};
+	}
 
 	public void expr() {
 		term();

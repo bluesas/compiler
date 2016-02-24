@@ -3,86 +3,98 @@ package lexer;
 import java.io.IOException;
 import java.util.Hashtable;
 
-public class Lexer{
+public class Lexer {
 
-	private Hashtable<String, Token> words = new Hashtable();
+    private Hashtable<String, Token> words = new Hashtable<>();
 
-	private int line = 1;
-	private int peek;
+    private int line = 1;
+    private int peek;
+    private InputController inputController;
 
-	public Lexer() {
-		reverse(new Word(Tag.TRUE, "true"));
-		reverse(new Word(Tag.FALSE, "false"));
-	}
+    public Lexer(InputController inputController) {
+        this.inputController = inputController;
 
-	public Token scan() throws IOException {
-		peek = getNextInput();
-		skipWhitespace();
-		if (Character.isDigit(peek)) {
-			return getNumber();
-		}
-		if (Character.isLetter(peek)) {
-			return getWord();
-		}
-		Token t = new Token(peek);
-		peek = ' ';
-		return t;
-	}
-		
-	private void reverse(Word w) {
-		words.put(w.lexeme, w);
-	}
+        reverse(new Word(Tag.TRUE, "true"));
+        reverse(new Word(Tag.FALSE, "false"));
+    }
 
-	private void skipWhitespace() {
-		
-		for(;;peek = getNextInput()) {
-			if ( Character.isWhitespace(peek) ) {
-				if ( peek == '\n' ) {
-					line++;
-				}
-			} else {
-				break;
-			}
-		}
+    public Token scan() throws IOException {
+        peek = getNextInput();
+        skipWhitespace();
+        if (Character.isDigit(peek)) {
+            return getNumber();
+        }
+        if (Character.isLetter(peek)) {
+            return getWord();
+        }
+        Token t = new Token(peek);
+        peek = ' ';
+        return t;
+    }
 
-	}
+    private void reverse(Word w) {
+        words.put(w.lexeme, w);
+    }
 
-	private Num getNumber() {
-		int v = 0;
-		do {
-			v = v * 10 + Character.digit(peek, 10);
-			peek = getNextInput();
-		} while (Character.isDigit(peek));
-		return new Num(v);
-	}
+    private void skipWhitespace() {
 
-	public int getLineNo() {
-		return line;
-	}
+        for (; ; peek = getNextInput()) {
+            if (Character.isWhitespace(peek)) {
+                if (peek == '\n') {
+                    line++;
+                }
+            } else {
+                break;
+            }
+        }
 
-	private Word getWord() {
-		StringBuffer b = new StringBuffer();
-		do {
-			b.append((char)peek);
-			peek = getNextInput();
-		} while ( Character.isLetterOrDigit(peek) );
+    }
 
-		String s = b.toString();
-		Word w = (Word) words.get(s);
-		if ( w != null ) {
-			return w;
-		}
+    private Num getNumber() {
+        int v = 0;
+        do {
+            v = v * 10 + Character.digit(peek, 10);
+            peek = getNextInput();
+        } while (Character.isDigit(peek));
+        return new Num(v);
+    }
 
-		w = new Word(Tag.ID, s);
-		words.put(s, w);
-		return w;
-	}
+    public int getLineNo() {
+        return line;
+    }
 
-	private char getNextInput(){
-		try {
-			return (char) System.in.read();
-		} catch (Exception e) {
-			return ' ';
-		}
-	}
+    public void setInputController(InputController inputController) {
+        this.inputController = inputController;
+    }
+
+    private Word getWord() {
+        StringBuilder b = new StringBuilder();
+        do {
+            b.append((char) peek);
+            peek = getNextInput();
+        } while (Character.isLetterOrDigit(peek));
+
+        String s = b.toString();
+        Word w = (Word) words.get(s);
+        if (w != null) {
+            return w;
+        }
+
+        w = new Word(Tag.ID, s);
+        words.put(s, w);
+        return w;
+    }
+
+    private char getNextInput() {
+        if (inputController != null)
+            return inputController.getNext();
+        else
+            return Character.END_PUNCTUATION;
+    }
+
+    public interface InputController {
+
+        char getNext();
+
+    }
 }

@@ -1,6 +1,8 @@
-/**
+package analyser; /**
  * exapmle 2.13
  */
+
+import analyser.Analyser;
 
 import java.util.Scanner;
 
