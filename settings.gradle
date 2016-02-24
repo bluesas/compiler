@@ -1,0 +1,4 @@
+rootProject.name = 'compilers'
+include 'ch02'
+findProject(':ch02')?.name = 'compiler'
+
