@@ -5,15 +5,12 @@ import java.util.Hashtable;
 
 public class Lexer {
 
-    private Hashtable<String, Token> words = new Hashtable<>();
+    protected Hashtable<String, Token> words = new Hashtable<>();
 
-    private int line = 1;
-    private int peek;
-    private InputController inputController;
+    protected int line = 1;
+    protected int peek;
 
-    public Lexer(InputController inputController) {
-        this.inputController = inputController;
-
+    public Lexer() {
         reverse(new Word(Tag.TRUE, "true"));
         reverse(new Word(Tag.FALSE, "false"));
     }
@@ -32,11 +29,11 @@ public class Lexer {
         return t;
     }
 
-    private void reverse(Word w) {
+    protected void reverse(Word w) {
         words.put(w.lexeme, w);
     }
 
-    private void skipWhitespace() {
+    protected void skipWhitespace() {
 
         for (; ; peek = getNextInput()) {
             if (Character.isWhitespace(peek)) {
@@ -50,7 +47,7 @@ public class Lexer {
 
     }
 
-    private Num getNumber() {
+    protected Num getNumber() {
         int v = 0;
         do {
             v = v * 10 + Character.digit(peek, 10);
@@ -63,11 +60,7 @@ public class Lexer {
         return line;
     }
 
-    public void setInputController(InputController inputController) {
-        this.inputController = inputController;
-    }
-
-    private Word getWord() {
+    protected Word getWord() {
         StringBuilder b = new StringBuilder();
         do {
             b.append((char) peek);
@@ -85,16 +78,13 @@ public class Lexer {
         return w;
     }
 
-    private char getNextInput() {
-        if (inputController != null)
-            return inputController.getNext();
-        else
-            return Character.END_PUNCTUATION;
+    protected char getNextInput() {
+        try {
+            return (char) System.in.read();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ' ';
+        }
     }
 
-    public interface InputController {
-
-        char getNext();
-
-    }
 }
